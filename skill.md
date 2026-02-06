@@ -10,7 +10,7 @@ Trigger when user needs:
 - Product price checking on Amazon or Newegg
 - Shopping searches across supported sites
 - Price tracking and alerts for products
-- Viewing Amazon orders, cart, or adding to cart
+- Adding to cart, viewing cart, or viewing orders on Amazon or Newegg
 - Any authenticated shopping site access
 
 **Prerequisite**: Must be logged into the target site in Chrome.
@@ -51,20 +51,24 @@ python scripts/run.py amazon product B0DN1492LG --screenshot /tmp/p.png
 ```
 Returns: All check-price fields + brand, features, image_count
 
-#### Add to Cart (Amazon only)
+#### Add to Cart
 ```bash
 python scripts/run.py amazon add-to-cart B09B8DQ26F
+python scripts/run.py newegg add-to-cart 0RN-005A-00SR1
 ```
 
-#### View Cart (Amazon only)
+#### View Cart
 ```bash
 python scripts/run.py amazon cart
+python scripts/run.py newegg cart
 ```
 
-#### My Orders (Amazon only)
+#### My Orders
 ```bash
 python scripts/run.py amazon my-orders --limit 5
+python scripts/run.py newegg my-orders --limit 5
 ```
+Note: Newegg orders require an active `secure.newegg.com` session in Chrome.
 
 ### Price Tracking
 
@@ -245,3 +249,4 @@ Shares virtual environment with stealth-browser skill (nodriver, pycryptodome).
 | Pool daemon won't start | Check `data/pool.pid` for stale PID |
 | Null titles in search | Fixed — uses cascading selector chain |
 | Missing price fields | Check if product page loaded (try with --screenshot) |
+| Newegg "requires re-authentication" | Newegg orders need a fresh `secure.newegg.com` session — log in via Chrome |
