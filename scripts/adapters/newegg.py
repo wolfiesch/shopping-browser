@@ -276,6 +276,7 @@ class NeweggShopper(ShopperBase):
             data = await self.evaluate("""
                 (() => {
                     const items = [];
+                    const seen = new Set();
 
                     // Cart item rows — try multiple container selectors
                     const rows = document.querySelectorAll(
@@ -297,6 +298,12 @@ class NeweggShopper(ShopperBase):
                             const match = href.match(/\\/p\\/([\\w-]+)/);
                             itemNumber = match ? match[1] : null;
                         }
+
+                        // Deduplicate — cart page has recommendation/warranty sections
+                        // that repeat the same product links
+                        const key = itemNumber || title;
+                        if (seen.has(key)) continue;
+                        seen.add(key);
 
                         const priceEl = row.querySelector('.price-current') ||
                                         row.querySelector('[class*="price"]');
@@ -325,6 +332,11 @@ class NeweggShopper(ShopperBase):
                         });
                     }
 
+                    // Cart count from page header text e.g. "Shopping Cart (1 Item)"
+                    const headerText = document.body.innerText;
+                    const countMatch = headerText.match(/Shopping Cart\\s*\\((\\d+)\\s*Item/i);
+                    const pageCount = countMatch ? countMatch[1] : String(items.length);
+
                     // Total/subtotal
                     const totalEl = document.querySelector('.summary-content-total strong') ||
                                     document.querySelector('.summary-content-total') ||
@@ -337,7 +349,7 @@ class NeweggShopper(ShopperBase):
                     }
 
                     return {
-                        cart_count: String(items.length),
+                        cart_count: pageCount,
                         items: items,
                         subtotal: subtotal,
                         url: window.location.href
