@@ -1,5 +1,8 @@
 # Shopping Browser
 
+[![CI](https://github.com/wolfiesch/shopping-browser/actions/workflows/ci.yml/badge.svg)](https://github.com/wolfiesch/shopping-browser/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Multi-site shopping automation with authenticated browsing, price tracking, and session pooling. Uses Chrome's own cookies via CDP injection to interact with shopping sites as you — no API keys needed.
 
 Currently supports **Amazon** and **Newegg**, with an adapter architecture for adding more sites.
@@ -112,33 +115,36 @@ The `--screenshot` flag saves a page capture for debugging selector issues.
 
 #### add-to-cart
 
-Add a product to your cart (Amazon only).
+Add a product to your cart.
 
 ```bash
 python scripts/run.py amazon add-to-cart B09B8DQ26F
+python scripts/run.py newegg add-to-cart N82E16835181195
 ```
 
 Returns: success status, product info, updated cart count.
 
 #### cart
 
-View current cart contents (Amazon only).
+View current cart contents.
 
 ```bash
 python scripts/run.py amazon cart
+python scripts/run.py newegg cart
 ```
 
 Returns: items with title/price/quantity, subtotal.
 
 #### my-orders
 
-View recent order history (Amazon only).
+View recent order history.
 
 ```bash
 python scripts/run.py amazon my-orders --limit 5
+python scripts/run.py newegg my-orders --limit 10
 ```
 
-Returns: order IDs, product ASINs, dates.
+Returns: order IDs, product links, dates.
 
 ### Price Tracking Commands
 
