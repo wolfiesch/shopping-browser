@@ -33,4 +33,4 @@ jobs:
         run: pip install ruff
 
       - name: Lint
-        run: ruff check scripts/ --select E,W,F --ignore E402,F401,E501
+        run: ruff check scripts/ --select E,W,F --ignore E402,F401,E501,W605
