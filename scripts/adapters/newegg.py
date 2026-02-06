@@ -373,10 +373,43 @@ class NeweggShopper(ShopperBase):
             return {"success": False, "error": "Cookie extraction failed"}
 
         try:
-            await self.navigate("https://secure.newegg.com/orders", wait=5)
+            # Navigate to Newegg homepage, then find order history link
+            await self.navigate("https://www.newegg.com", wait=3)
+            # Extract the actual order history URL from the account menu
+            order_url = await self.evaluate("""
+                (() => {
+                    // Look for order-related links in account dropdown or page
+                    const links = document.querySelectorAll('a[href*="order"], a[href*="Order"]');
+                    for (const link of links) {
+                        const href = link.href || '';
+                        const text = (link.textContent || '').toLowerCase();
+                        if (text.includes('order') && href.includes('newegg')) {
+                            return href;
+                        }
+                    }
+                    return null;
+                })()
+            """)
+            target = order_url if isinstance(order_url, str) and order_url.startswith('http') \
+                else "https://secure.newegg.com/orders/list"
+            await self.navigate(target, wait=5)
 
             if screenshot:
                 await self.page.save_screenshot(screenshot)
+
+            # Detect auth redirect — Newegg account pages require fresh login
+            landed_url = await self.evaluate("window.location.href")
+            if isinstance(landed_url, dict):
+                url_str = landed_url.get("value", str(landed_url))
+            else:
+                url_str = str(landed_url)
+            if "signin" in url_str or "identity" in url_str:
+                return {
+                    "success": False,
+                    "error": "Newegg requires re-authentication for order history. "
+                             "Log into secure.newegg.com in Chrome, then retry.",
+                    "url": url_str
+                }
 
             data = await self.evaluate(f"""
                 (() => {{
